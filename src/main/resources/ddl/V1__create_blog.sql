@@ -11,3 +11,5 @@ CREATE TABLE IF NOT EXISTS `blog` (
 
 INSERT INTO blog (id, title, content, author, create_time) VALUES
   (1, 'first blog', 'Hello, World, This is my first blog', 'koly', NOW());
+INSERT INTO blog (id, title, content, author, create_time) VALUES
+  (2, 'second blog', 'Today is a beautiful day, and the sunshine is fine.', 'koly', NOW());

@@ -9,13 +9,7 @@ public class DriverManagerPrac {
             Connection connection = DriverManager.getConnection("jdbc:mysql://192.168.1.10:3306/test?characterEncoding=utf8&useSSL=false&serverTimezone=UTC", "koly", "koly");
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("select * from blog");
-            while (resultSet.next()) {
-                System.out.println(resultSet.getInt(1) + "["
-                        + resultSet.getString(2) + "]"
-                        + resultSet.getString(3) + "--"
-                        + resultSet.getString("author") + "=="
-                        + resultSet.getDate("create_time"));
-            }
+            CommonUtils.printResultSet(resultSet);
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -23,4 +17,5 @@ public class DriverManagerPrac {
             e.printStackTrace();
         }
     }
+
 }
