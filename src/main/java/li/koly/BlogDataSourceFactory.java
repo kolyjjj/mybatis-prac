@@ -13,8 +13,9 @@ import javax.sql.DataSource;
 public class BlogDataSourceFactory {
     public static DataSource getBlogDataSource() {
         MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL("jdbc:mysql://127.0.0.1/test?" +
-                "user=root&password=mysqlHolder");
+        dataSource.setURL(Constants.DATABASE_URL);
+        dataSource.setUser(Constants.DATABASE_USER_NAME);
+        dataSource.setPassword(Constants.DATABASE_PASSWORD);
         return dataSource;
     }
 }
