@@ -30,7 +30,7 @@ openSession的流程：
 * configuration.getMappedStatement(statement)
 * executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER)
 
-Key:
+从dataSource和transactionFactory到session:
 * 源头是dataSource和transactionFactory，尽头是一个session
 * 中间使用了Environment这个抽象来代表dataSource和transactionFactory
 * 又使用了Configuration来代表mybatis的具体配置和Environment
