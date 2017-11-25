@@ -8,6 +8,9 @@ use mybatis only
 * Mybatis
 * Mysql
 
+### create database
+* `CREATE DATABASE test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`参考https://dba.stackexchange.com/questions/76788/create-a-database-with-charset-utf-8/152383#152383
+
 ### mybatis source follow
 Configuration 持有了environment，并通过addMapper的方式添加了对应的Mapper
 environment持有了transactionFactory和dataSource
