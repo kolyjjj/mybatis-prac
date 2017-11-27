@@ -60,3 +60,8 @@ xml或者interface中的sql语句会被加载到内存中来，也就意味着�
 * 解析xml或者Mapper Interface中的Annotation。这个过程的输出是一系列的MappedStatement，这些MappedStatement被包含在Configuration中。
 * 通过MappedStatement执行具体的sql语句。这里要考虑Cache的事情，interceptor的事情，以及返回的resultSet到具体的对象的问题。
 
+
+SQl语句的执行：
+* PrepareStatement这种方式，会调用Sql提供的借口connection.prepareStatement(sql, keyColumnNames)。这个接口
+回去执行对应的sql，如果是查询的话，只查询keyColumnNames包含的列。其中，sql是从BoundSql中取出来的，而keyColumnNames是从
+mappedStatement中取出来的。这两个东西之前都是存储在Configuration中的
