@@ -65,3 +65,9 @@ SQl语句的执行：
 * PrepareStatement这种方式，会调用Sql提供的借口connection.prepareStatement(sql, keyColumnNames)。这个接口
 回去执行对应的sql，如果是查询的话，只查询keyColumnNames包含的列。其中，sql是从BoundSql中取出来的，而keyColumnNames是从
 mappedStatement中取出来的。这两个东西之前都是存储在Configuration中的
+
+返回结果如何变为对象？
+* 输入是两个：一个是ResultSetWrapper，wrap了ResultSet(由Statement返回)以及Configuration。以及一个List<ResultMap>，
+包含了结果映射信息。
+* 主要处理函数是：DefaultResultSetHandler.handleResultSet。
+* 最终的结果会保存在multipleResults，这是一个传入handleResultSet的参数，传进去又传出来，违反了Clean Code。
