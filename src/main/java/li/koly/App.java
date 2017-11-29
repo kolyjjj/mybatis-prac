@@ -26,9 +26,9 @@ public class App {
         SqlSessionFactory sqlSessionFactory = xmlSqlSessionFactory();
         SqlSession session = sqlSessionFactory.openSession();
         try {
-//            Blog blog = session.selectOne("li.koly.BlogMapper.selectBlog", 1L);
-            BlogMapper mapper = session.getMapper(BlogMapper.class);
-            Blog blog = mapper.selectBlog(1L);
+            Blog blog = session.selectOne("li.koly.BlogMapper.selectBlog", 1L);
+//            BlogMapper mapper = session.getMapper(BlogMapper.class);
+//            Blog blog = mapper.selectBlog(1L);
             System.out.println(blog.toString());
         } catch (Exception e) {
             e.printStackTrace();
