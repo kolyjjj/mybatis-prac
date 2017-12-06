@@ -3,6 +3,9 @@ package li.koly;
 import li.koly.concurrent.QuickSort;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class QuickSorTest {
 
     @Test
@@ -13,4 +16,14 @@ public class QuickSorTest {
             System.out.println(result[i]);
         }
     }
+
+    @Test
+    public void should_jj() {
+        int i = 0;
+        List<Integer> a = Arrays.asList(1, 2, 3);
+        if(a.get(++i) == 2 && i == 1) {
+            System.out.println("hello");
+        }
+    }
+
 }
