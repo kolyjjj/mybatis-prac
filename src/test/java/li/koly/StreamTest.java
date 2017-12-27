@@ -3,13 +3,19 @@ package li.koly;
 import org.junit.Test;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// reference: http://winterbe.com/posts/2014/07/31/java8-stream-tutorial-examples/
 public class StreamTest {
 
 
@@ -78,32 +84,41 @@ public class StreamTest {
     @Test
     public void should_collect_to_list() {
         List<Integer> list = prepareList();
-        list.stream().collect(new Collector<Integer, Integer, Integer>() {
+        Integer sum = list.stream().collect(new Collector<Integer, Integer[], Integer>() {
+
+
             @Override
-            public Supplier<Integer> supplier() {
-                return null;
+            public Supplier<Integer[]> supplier() {
+                return () -> new Integer[1];
             }
 
             @Override
-            public BiConsumer<Integer, Integer> accumulator() {
-                return null;
+            public BiConsumer<Integer[], Integer> accumulator() {
+                return (integers, integer) -> integers[0] = integers[0] + 1;
             }
 
             @Override
-            public BinaryOperator<Integer> combiner() {
-                return null;
+            public BinaryOperator<Integer[]> combiner() {
+                return new BinaryOperator<Integer[]>() {
+                    @Override
+                    public Integer[] apply(Integer[] integers, Integer[] integers2) {
+                        integers[0] += integers2[0];
+                        return integers;
+                    }
+                };
             }
 
             @Override
-            public Function<Integer, Integer> finisher() {
-                return null;
+            public Function<Integer[], Integer> finisher() {
+                return integers -> integers[0];
             }
 
             @Override
             public Set<Characteristics> characteristics() {
-                return null;
+                return Collections.unmodifiableSet(EnumSet.of(Characteristics.IDENTITY_FINISH));
             }
         });
+        assertThat(sum).isEqualTo(10);
     }
 
     @Test
@@ -111,12 +126,6 @@ public class StreamTest {
         List<Integer> list = prepareList();
         List<String> result = list.stream().map(i -> i.toString()).collect(Collectors.toList());
         assertThat(result).containsExactly("1", "2", "4", "3");
-    }
-
-    @Test
-    public void should_flat_map() {
-        List<Integer> list = prepareList();
-//        list.stream().flatMap()
     }
 
 
@@ -276,9 +285,116 @@ public class StreamTest {
         assertThat(paralMap).containsExactly("1", "2", "4", "3");
     }
 
+
+    @Test
+    public void should_parallel_whoo() {
+        Arrays.asList("a1", "a2", "b1", "c2", "c1")
+                .parallelStream()
+                .filter(s -> {
+                    System.out.format("filter: %s [%s]\n",
+                            s, Thread.currentThread().getName());
+                    return true;
+                })
+                .map(s -> {
+                    System.out.format("map: %s [%s]\n",
+                            s, Thread.currentThread().getName());
+                    return s.toUpperCase();
+                })
+                .forEach(s -> System.out.format("forEach: %s [%s]\n",
+                        s, Thread.currentThread().getName()));
+    }
+
+    @Test
+    public void should_lazy() {
+        Stream.of(1, 2, 3).filter(x -> {
+            System.out.println("filter " + x);
+            return x > 1;
+        }).map(x -> {
+            System.out.println("map " + x);
+            return "a" + String.valueOf(x);
+        });
+    }
+
+    @Test
+    public void should_lazy_until_terminal() {
+        Stream.of(1, 2, 3).filter(x -> {
+            System.out.println("filter " + x);
+            return x > 1;
+        }).map(x -> {
+            System.out.println("map " + x);
+            return "a" + String.valueOf(x);
+        }).forEach(System.out::println);
+    }
+
     @Test
     public void should_use_stream_build() {
+        ConcurrentHashMap<String, String> map = new ConcurrentHashMap<>();
+    }
 
+    @Test
+    public void should_flat_map() {
+        List<Enterprise> enterpriseList = new ArrayList<>();
+        IntStream.range(1, 4)
+                .forEach(i -> enterpriseList.add(new Enterprise("enter " + i)));
+        enterpriseList
+                .forEach(e -> IntStream.range(1, 4)
+                        .forEach(i -> e.users.add(new User("user " + i))));
+
+        enterpriseList.stream().flatMap(e -> e.users.stream()).forEach(u -> System.out.println(u.name));
+    }
+
+    @Test
+    public void should_flat_map_fluently() {
+        IntStream.range(1, 4)
+                .mapToObj(i -> new Enterprise("enter " + i))
+                .peek(e -> IntStream.range(1, 4).mapToObj(i -> new User("user " + i)).forEach(e.users::add))
+                .flatMap(e -> e.users.stream())
+                .forEach(u -> System.out.println(u.name));
+    }
+
+    @Test
+    public void should_optional_flat_map() {
+        Outer outer = new Outer();
+        if (outer != null && outer.nested != null && outer.nested.inner != null) {
+            System.out.println(outer.nested.inner.name);
+        }
+
+        // instead
+        Optional.of(new Outer())
+                .flatMap(o -> Optional.ofNullable(o.nested))
+                .flatMap(n -> Optional.ofNullable(n.inner))
+                .flatMap(i -> Optional.ofNullable(i.name))
+                .ifPresent(System.out::println);
+    }
+
+    class Outer {
+        Nested nested;
+    }
+
+    class Nested {
+        Inner inner;
+    }
+
+    class Inner {
+        String name;
+    }
+
+
+    private static class Enterprise {
+        String name;
+        List<User> users = new ArrayList<>();
+
+        public Enterprise(String name) {
+            this.name = name;
+        }
+    }
+
+    private static class User {
+        String name;
+
+        User(String name) {
+            this.name = name;
+        }
     }
 
 }
