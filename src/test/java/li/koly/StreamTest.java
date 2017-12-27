@@ -397,4 +397,75 @@ public class StreamTest {
         }
     }
 
+
+    private List<Person> persons = Arrays.asList(
+            new Person("Max", 18),
+            new Person("Peter", 23),
+            new Person("Pamela", 23),
+            new Person("David", 12)
+    );
+
+    @Test
+    public void should_collect_grouping_by() {
+        Map<Integer, List<Person>> personsByAge = persons.stream().collect(Collectors.groupingBy(p -> p.age));
+        personsByAge.forEach((age, p) -> System.out.format("age %d : %s\n", age, p));
+    }
+
+    @Test
+    public void should_collect_average_int() {
+        Double averageAge = persons.stream().collect(Collectors.averagingInt(p -> p.age));
+        System.out.println(averageAge);
+    }
+
+    @Test
+    public void should_collect_summarize() {
+        IntSummaryStatistics statistics = persons.stream().collect(Collectors.summarizingInt(p -> p.age));
+        System.out.println(statistics);
+    }
+
+    @Test
+    public void should_collect_joining() {
+        String result = persons.stream()
+                .map(p -> p.name)
+                .collect(Collectors.joining(" and ", "In China", " are of legal age"));
+        System.out.println(result);
+    }
+
+    @Test
+    public void should_collect_to_map() {
+        Map<Integer, String> map = persons.stream()
+                .collect(Collectors.toMap(p -> p.age, p -> p.name, (name1, name2) -> name1 + " ; " + name2));
+        System.out.println(map);
+    }
+
+    @Test
+    public void should_use_collector_of() {
+        Collector<Person, StringJoiner, String> personNameCollector =
+                Collector.of(
+                        () -> new StringJoiner(" | "),          // supplier
+                        (j, p) -> j.add(p.name.toUpperCase()),  // accumulator
+                        (j1, j2) -> j1.merge(j2),               // combiner
+                        StringJoiner::toString);                // finisher
+        String collect = persons.stream()
+                .collect(personNameCollector);
+
+        System.out.println(collect);
+    }
+
+
+    class Person {
+        String name;
+        int age;
+
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
 }
